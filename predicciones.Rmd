@@ -1,0 +1,48 @@
+library(Quandl)
+library(ggplot2)
+library(lubridate)
+
+
+#PUNTO 4A
+#Importa tasa de cambio
+TASA<-Quandl("CURRFX/USDCOP", trim_start="2000-01-01", trim_end="2015-02-23", collapse="daily")
+
+#Imprime primeras 5 lineas
+head(TASA,5)
+
+
+#PUNTO 4B
+#Visualizacion de datos
+#Variable X
+FECHA=TASA[1]
+#VAriable Y
+TASADEC=TASA[2]
+
+#Tasa de cambio diaria
+ggplot(TASA, aes(x = Date, y = Rate)) + geom_line() + labs(x = "FECHA") + labs(y = "TASA DE CAMBIO") + ggtitle("USD/COP Tasa de Cambio (diaria) desde Enero 01 2000 hasta Febrero 23 2015") 
+
+
+#PUNTO 4C
+TA<-Quandl("CURRFX/USDCOP", trim_start="2000-01-01", trim_end="2015-02-23", collapse="annual")
+ggplot(TA, aes(x = Date, y = Rate)) + geom_line() + labs(x = "FECHA") + labs(y = "TASA DE CAMBIO") + ggtitle("USD/COP Tasa de Cambio (anual) desde Enero 01 2000 hasta Febrero 23 2015") 
+
+
+#PUNTO 4D
+Date <- TASA[1]
+Rate <- TASA[2]
+
+#Se genera el modelo Rate=B0+B1*Date+E (modelo lineal)
+Cambio.lm = lm(Rate ~ Date, data = TASA)
+
+#Se genera la tabla anova que determina el analisis de SCE(Suma de los cuadrados de los errores), SCR (Suma de los cuadrados de la regresion) y SCT(Suma de los cuadrados totales)
+anova(Cambio.lm)
+#Arroja los valores del intercepto y de B1 (determina cuanto cambia la tasa de cambio (variable y) si la variable independiente (tiempo) varia en una unidad (un año)
+summary(Cambio.lm)
+
+Bo <- 3.935e+03 
+B1 <- -1.277e-01
+Time <- 2017
+
+#Se remplazan los valores obtenidos para cada uno de los parametros y el tiempo es remplazado por 2017. De esta manera se genera una regrsion, dad que es de facil acceso y analisis. 
+Tasa <- 3.935e+03 -(1.277e-01*2017)
+#Resultado: Expectativa de tasa de cambio para el 2017 3657.74
